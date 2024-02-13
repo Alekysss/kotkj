@@ -5,7 +5,10 @@ using UnityEngine;
 public class playerMovement : MonoBehaviour
 {
     public float playerSpeed = 20f;
-    private CharacterController myCC;
+    private CharacterController myCC; //myCC = MyCharacter Controler
+    public Animator camAnim;
+    private bool isWalking;
+
     private Vector3 inputVector;
     private Vector3 movementVector;
     private float myGravity = -10f;
@@ -18,6 +21,9 @@ public class playerMovement : MonoBehaviour
     {
         getInput();
         MovePlayer();
+        CheckForHeadBob();
+
+        camAnim.SetBool("isWalking",isWalking  );
     }
 
     void getInput()
@@ -34,4 +40,15 @@ public class playerMovement : MonoBehaviour
         myCC.Move(movementVector * Time.deltaTime);
     }
 
+    void CheckForHeadBob()
+    {
+       if (myCC.velocity.magnitude > 0.1f)
+        {
+            isWalking = true;
+        }
+        else
+        {
+            isWalking = false;
+        }
+    }
 }
