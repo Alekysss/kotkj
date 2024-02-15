@@ -4,7 +4,10 @@ using UnityEngine;
 
 public class playerMovement : MonoBehaviour
 {
-    public float playerSpeed = 20f;
+    public float playerSpeed = 10f;
+    public float momentumDamping = 5f;
+
+
     private CharacterController myCC; //myCC = MyCharacter Controler
     public Animator camAnim;
     private bool isWalking;
@@ -21,17 +24,29 @@ public class playerMovement : MonoBehaviour
     {
         getInput();
         MovePlayer();
-        CheckForHeadBob();
 
         camAnim.SetBool("isWalking",isWalking  );
     }
 
     void getInput()
     {
-        inputVector = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
-        inputVector.Normalize();
-        inputVector = transform.TransformDirection(inputVector);
+        if(Input.GetKey(KeyCode.W) ||
+            Input.GetKey(KeyCode.A) ||
+            Input.GetKey(KeyCode.S) ||
+            Input.GetKey(KeyCode.D))
+        {
+            inputVector = new Vector3(Input.GetAxisRaw("Horizontal"), 0f, Input.GetAxisRaw("Vertical"));
+            inputVector.Normalize();
+            inputVector = transform.TransformDirection(inputVector);
 
+            isWalking = true;
+        }
+        else
+        {
+            inputVector = Vector3.Lerp(inputVector, Vector3.zero, momentumDamping * Time.deltaTime);
+
+            isWalking = false;
+        }
         movementVector  = (inputVector * playerSpeed) + (Vector3.up * myGravity);
     }
 
@@ -40,15 +55,5 @@ public class playerMovement : MonoBehaviour
         myCC.Move(movementVector * Time.deltaTime);
     }
 
-    void CheckForHeadBob()
-    {
-       if (myCC.velocity.magnitude > 0.1f)
-        {
-            isWalking = true;
-        }
-        else
-        {
-            isWalking = false;
-        }
-    }
+    
 }
