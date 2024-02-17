@@ -6,17 +6,20 @@ public class Gun : MonoBehaviour
 {
     public float range = 20f;
     public float verticalRange = 20f;
-    public float firerate;
+    public float gunShotRadius = 20f;
+
     public float bigDamage = 2f;
     public float smallDamage = 1f;
 
+    public float firerate = 1f;
     private float nextTimeToFire;
-    private BoxCollider gunTrigger;
-
-
+   
     public LayerMask raycastLayerMask;
-    public EnemyManager enemyManager;
+    public LayerMask enemyLayerMask;
 
+
+    public EnemyManager enemyManager;
+    private BoxCollider gunTrigger;
     void Start()
     {
         gunTrigger = GetComponent<BoxCollider>();
@@ -38,6 +41,20 @@ public class Gun : MonoBehaviour
 
     void Fire()
     {
+        // simulate gun shot radios
+        Collider[] enemyColliders;
+        enemyColliders = Physics.OverlapSphere(transform.position, gunShotRadius, enemyLayerMask);
+        //alert any enemy nearby
+        foreach (var enemyCollider in enemyColliders)
+        {
+            enemyCollider.GetComponent<EnemyAwareness>().isAggro = true;
+        }
+
+
+        //play test audio
+        GetComponent<AudioSource>().Stop();
+        GetComponent<AudioSource>().Play();
+
         //damge enemies
         foreach (var enemy in enemyManager.enemiesInTrigger)
         {
